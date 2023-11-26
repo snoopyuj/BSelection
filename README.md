@@ -1,6 +1,11 @@
 # BSelection
 
-The Unity tool for quickly selecting multiple gameobjects in the scene
+The Unity tool designed for quickly selecting recorded list of objects in the scene.
+
+## Usage
+
+After selecting the objects you want to record, press the save button to store the chosen items for easy retrieval in the future.  
+Additionally, you can name the group for the selection to categorize it.
 
 ## Demo
 ---

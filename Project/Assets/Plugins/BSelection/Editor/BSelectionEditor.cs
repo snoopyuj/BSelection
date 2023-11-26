@@ -1,4 +1,4 @@
-﻿/*
+/*
  * @author	Wayne Su
  * @date	2019/12/14
  */
@@ -101,12 +101,12 @@ namespace BTools.BSelection
             return (pathObjList, _trans.GetSiblingIndex());
         }
 
-        private void OnGUI()
+        public void OnGUI()
         {
             var objs = Selection.gameObjects;
             var objsCount = objs.Length;
 
-            #region 添加物件
+            #region Add Selection
 
             Rect addObjFieldRect = new Rect(1f, 0f, (position.width - 2f), 20f);
             DrawBackgroundBox(addObjFieldRect, AddFieldColor);
@@ -114,11 +114,11 @@ namespace BTools.BSelection
             EditorGUILayout.BeginHorizontal();
             {
                 EditorGUIUtility.labelWidth = 100f;
-                EditorGUILayout.LabelField(string.Format("已選 {0} 個項目", objsCount), GUILayout.Width(152f));
+                EditorGUILayout.LabelField(string.Format("{0} selected", objsCount), GUILayout.Width(152f));
 
                 GUI.enabled = (objsCount > 0);
 
-                if (GUILayout.Button("記錄", GUILayout.Width(50f)))
+                if (GUILayout.Button("Save", GUILayout.Width(50f)))
                 {
                     SaveSelectionsIntoFiles(objs);
                 }
@@ -127,9 +127,9 @@ namespace BTools.BSelection
             }
             EditorGUILayout.EndHorizontal();
 
-            #endregion 添加物件
+            #endregion Add Selection
 
-            #region 群組清單
+            #region Show list
 
             var dataInfoList = SelectionData.dataInfoList;
 
@@ -139,14 +139,14 @@ namespace BTools.BSelection
             EditorGUILayout.BeginHorizontal();
             {
                 EditorGUILayout.LabelField("[No.]", GUILayout.Width(40f));
-                EditorGUILayout.LabelField("[群組名稱]", GUILayout.Width(100f));
+                EditorGUILayout.LabelField("[Group]", GUILayout.Width(100f));
                 EditorGUILayout.LabelField("", GUILayout.Width(5f));
 
                 GUI.enabled = (dataInfoList.Count > 0);
 
-                if (GUILayout.Button("全部清除", GUILayout.Width(104f)))
+                if (GUILayout.Button("Clear All", GUILayout.Width(104f)))
                 {
-                    if (EditorUtility.DisplayDialog("確認清除?", "確定清除所有紀錄?", "OK", "Cancel"))
+                    if (EditorUtility.DisplayDialog("Confirm Delete?", "Are you sure you want to delete all groups?", "OK", "Cancel"))
                     {
                         dataInfoList.Clear();
                         EditorUtility.SetDirty(SelectionData);
@@ -185,13 +185,14 @@ namespace BTools.BSelection
                         {
                             EditorUtility.SetDirty(SelectionData);
                         }
-                        else if (GUILayout.Button("選取", GUILayout.Width(50f)))
+                        else if (GUILayout.Button("Select", GUILayout.Width(80f)))
                         {
                             SelectObjects(curInfo);
                         }
-                        else if (GUILayout.Button("清除", GUILayout.Width(50f)))
+                        else if (GUILayout.Button("X", GUILayout.Width(20f)))
                         {
-                            if (EditorUtility.DisplayDialog("確認清除?", "確定清除此紀錄?", "OK", "Cancel"))
+                            if (EditorUtility.DisplayDialog("Confirm Delete?", $"Are you sure you want to delete \"{curInfo.name}\" group?", "OK", "Cancel"))
+
                             {
                                 deleteIdx = i;
                             }
@@ -210,7 +211,7 @@ namespace BTools.BSelection
             }
             EditorGUILayout.EndScrollView();
 
-            #endregion 群組清單
+            #endregion Show list
         }
 
         private string GetEditorScriptFilePath()
@@ -273,7 +274,7 @@ namespace BTools.BSelection
                 string saveModeName = (_dataInfo.isPrefabMode) ? "Prefab" : "Scene";
                 string curModeName = (isCurInPrefabMode) ? "Prefab" : "Scene";
 
-                if (EditorUtility.DisplayDialog("模式錯誤", string.Format("模式不符! \n\n紀錄為 {0} 模式 \n目前在 {1} 模式", saveModeName, curModeName), "取消選取"))
+                if (EditorUtility.DisplayDialog("Mismatch Mode", $"\"{_dataInfo.name}\" is in {saveModeName} mode. \nCurrently in {curModeName} mode.", "Deselect"))
                 {
                     return;
                 }
@@ -306,7 +307,7 @@ namespace BTools.BSelection
 
                     if (curTrans == null)
                     {
-                        if (EditorUtility.DisplayDialog("是否繼續?", string.Format("查無 {0} 物件, 繼續選取剩下物件?", data.pathList[data.pathList.Count - 1]), "OK", "Cancel"))
+                        if (EditorUtility.DisplayDialog("Continue?", $"No \"{data.pathList[data.pathList.Count - 1]}\" object found. Continue selecting the remaining objects?", "OK", "Cancel"))
                         {
                             break;
                         }
@@ -328,7 +329,7 @@ namespace BTools.BSelection
                         {
                             curTrans = childAtIdx;
                         }
-                        else if (!EditorUtility.DisplayDialog("物件階層位置已變更", string.Format("{0} 已不在原本階層順序上, 目前選擇的也許不是原本記錄的物件, 是否選取該物件?", curTrans.name), "OK", "Cancel"))
+                        else if (!EditorUtility.DisplayDialog("The object hierarchy has changed", $"\"{curTrans.name}\" is no longer in its original order. The currently selected object may not be the one originally recorded. Do you want to select this object?", "OK", "Cancel"))
                         {
                             break;
                         }
